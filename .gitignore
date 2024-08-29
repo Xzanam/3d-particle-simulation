@@ -1,0 +1,40 @@
+# CMake generated files
+/build/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+CTestTestfile.cmake
+
+# Compiled object files and binaries
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+
+# IDE specific files
+.vscode/
+.idea/
+*.suo
+*.user
+*.ncb
+*.sdf
+*.swp
+*.swo
+*.log
+
+# GLAD generated files (if using a generated GLAD directory)
+# /path/to/your/glad/auto_generated/
+# Uncomment if you have specific auto-generated files for GLAD
+
+# System specific files
+.DS_Store
+Thumbs.db
+
+# Other build artifacts
+*.out
+*.dSYM/
+
