@@ -37,18 +37,48 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Load shaders
-    Shader particleShader("shaders/particle.vert", "shaders/particle.frag");
-
+    Shader particleShader("../shaders/particle.vert", "../shaders/particle.frag");
     // Particle setup here
+    //traingle check 
+    float vertices[] = { 
+        -0.5f, -0.5f, 0.0f, 
+         0.5f, -0.5f, 0.0f, 
+         0.0f,  0.5f, 0.0f, 
+    };
+
+    unsigned int VBO; 
+    unsigned int VAO; 
+
+    glGenBuffers(1, &VBO); 
+    glGenVertexArrays(1, &VAO); 
+    glBindVertexArray(VAO); 
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO); 
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),vertices, GL_STATIC_DRAW);
+
+
+    glVertexAttribPointer(0, 3 , GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); 
+    glEnableVertexAttribArray(0); 
+
+    //creaiting the vertex array object 
+   
+
+
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        // Render particles
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
+        glClear(GL_COLOR_BUFFER_BIT); 
 
-        glfwSwapBuffers(window);
+        // Render particles
+        particleShader.use();
+        glBindVertexArray(VAO); 
+        glDrawArrays(GL_TRIANGLES, 0, 3); 
+
         glfwPollEvents();
+        glfwSwapBuffers(window);
     }
 
     glfwTerminate();
