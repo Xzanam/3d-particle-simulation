@@ -23,7 +23,6 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     vShaderStream << vShaderFile.rdbuf();
     fShaderStream << fShaderFile.rdbuf();
 
-    std::cout<<11111<<vShaderStream.str(); 
     // close file handlers
     vShaderFile.close();
     fShaderFile.close();

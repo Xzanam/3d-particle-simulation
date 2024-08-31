@@ -1,16 +1,17 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
+#include "constants.h"
 #include "Shader.h"
 #include "Particle.h"
 #include "Camera.h"
-#include "constants.h"
 
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn); 
+void processCameraMovement(GLFWwindow* window); 
 
 
 int main() {
@@ -45,17 +46,6 @@ int main() {
     
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
     glEnable(GL_DEPTH_TEST); 
-
-    // camera
-    float lastX = W_WIDTH / 2.0f;
-    float lastY = W_HEIGHT / 2.0f;
-    bool firstMouse = true;
-
-    float deltaTime = 0.0f; // Time between current frame and last frame
-    float lastFrame = 0.0f; // Time of last frame   
-
-
-
     // Load shaders
     Shader particleShader("../shaders/particle.vert", "../shaders/particle.frag");
     // Particle setup here
@@ -123,6 +113,10 @@ int main() {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+
+        float currentFrame  = static_cast<float>(glfwGetTime()); 
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame; 
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
@@ -132,15 +126,15 @@ int main() {
   
         // create transformations
         glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        glm::mat4 view          = glm::mat4(1.0f);
+        glm::mat4 view          = camera.GetViewMatrix();
         glm::mat4 projection    = glm::mat4(1.0f);
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-        view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)W_WIDTH / (float)W_HEIGHT, 0.1f, 100.0f);
         // retrieve the matrix uniform locations
         particleShader.setMat4("model", model);
         particleShader.setMat4("view", view); 
         particleShader.setMat4("projection", projection);
+
 
         // Render particles
         glBindVertexArray(VAO); 
@@ -161,6 +155,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    processCameraMovement(window); 
+    // std::cout<<camera.Position.x;
 }
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
@@ -181,4 +177,24 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastY = ypos;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void processCameraMovement(GLFWwindow* window)
+{
+
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_SPACE ) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+    // else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE)
+    //     camera.thirdCamera(TPP, deltaTime,0);
+
 }
