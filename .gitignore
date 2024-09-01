@@ -5,8 +5,8 @@ CMakeCache.txt
 Makefile
 cmake_install.cmake
 CTestTestfile.cmake
-
-*.zip
+3d-particle-simulation.code-workspace
+sphere.zip
 # Compiled object files and binaries
 *.o
 *.obj
