@@ -5,6 +5,7 @@
         worldUp = up;
         Yaw = yaw;
         Pitch = pitch;
+        Up = up;
         MovementSpeed = SPEED; 
         MouseSensitivity = SENSITIVITY;
         updateCameraVectors();
@@ -52,6 +53,8 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
         Position += Up * velocity; 
     if (direction == DOWN)
         Position -= Up * velocity;
+    if(Position.y < 0 ) 
+        Position.y = 0;
 }
     // calculates the front vector from the Camera's (updated) Euler Angles
 void Camera::updateCameraVectors()

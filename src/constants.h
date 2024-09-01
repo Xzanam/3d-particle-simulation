@@ -17,7 +17,13 @@ const int W_HEIGHT  = 700;
 
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.1f, 3.0f));
+
+
+//the ground plane 
+
+glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 planePosition = glm::vec3(0.0f, -0.5f, 0.0f);  
 
 float lastX = W_WIDTH / 2.0f;
 float lastY = W_HEIGHT / 2.0f;

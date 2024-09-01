@@ -5,8 +5,7 @@
 #include "Shader.h"
 #include "Particle.h"
 #include "Camera.h"
-
-
+#include "Sphere.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -45,12 +44,12 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback); 
     
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
-    glEnable(GL_DEPTH_TEST); 
-    // Load shaders
     Shader particleShader("../shaders/particle.vert", "../shaders/particle.frag");
+    Shader groundShader("../shaders/ground.vert", "../shaders/ground.frag"); 
     // Particle setup here
     //traingle check //
     float vertices[] = {//
+
         -0.5f, -0.5f, -0.5f, // 0.0f, 0.0f,
          0.5f, -0.5f, -0.5f, // 1.0f, 0.0f,
          0.5f,  0.5f, -0.5f, // 1.0f, 1.0f,
@@ -93,7 +92,24 @@ int main() {
         -0.5f,  0.5f,  0.5f, // 0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f, // 0.0f, 1.0f
     };//
-//
+
+   //arraybuffers for ground 
+  unsigned int VAO1, VBO1;
+ 
+  glGenBuffers(1, &VBO1); 
+  glGenVertexArrays(1, &VAO1); 
+
+  glBindVertexArray(VAO1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO1); 
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0 ); 
+  glEnableVertexAttribArray(0); 
+
+
+
     unsigned int VBO; //
     unsigned int VAO; 
 
@@ -108,8 +124,14 @@ int main() {
     glVertexAttribPointer(0, 3 , GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); 
     glEnableVertexAttribArray(0); 
 
-    //3D 
-   
+    Sphere ball(0.5, 72, 36); 
+
+ 
+  glEnable(GL_DEPTH_TEST); 
+
+
+
+  
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -121,25 +143,41 @@ int main() {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT); 
-
-        particleShader.use();
-  
-        // create transformations
+       
+       
+         // create transformations
         glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
         glm::mat4 view          = camera.GetViewMatrix();
         glm::mat4 projection    = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+        // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)W_WIDTH / (float)W_HEIGHT, 0.1f, 100.0f);
+      
+       //ground rendering 
+       groundShader.use(); 
+   
+        glm::mat4 ground_model = glm::mat4(1.0f); // Identity matrix
+        ground_model = glm::scale(ground_model, glm::vec3(1000.0f, 0.1f, 1000.0f)); // Scale to make it large and thin
+        ground_model = glm::translate(ground_model, planePosition); // Move it slightly down to ensure it's visible
+        groundShader.setMat4("model", ground_model ); 
+        groundShader.setMat4("view", view); 
+        groundShader.setMat4("projection", projection); 
+        glBindVertexArray(VAO1);
+        glDrawArrays(GL_TRIANGLES, 0 , 36);
+
+
+        particleShader.use();
         // retrieve the matrix uniform locations
         particleShader.setMat4("model", model);
         particleShader.setMat4("view", view); 
-        particleShader.setMat4("projection", projection);
-
-
+        
         // Render particles
-        glBindVertexArray(VAO); 
-        glDrawArrays(GL_TRIANGLES, 0, 36); 
+        // glBindVertexArray(VAO); 
+        // glDrawArrays(GL_TRIANGLES, 0, 36); 
 
+       particleShader.setMat4("projection", projection);      
+
+       ball.draw();
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
@@ -194,6 +232,8 @@ void processCameraMovement(GLFWwindow* window)
         camera.ProcessKeyboard(DOWN, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_SPACE ) == GLFW_PRESS)
         camera.ProcessKeyboard(UP, deltaTime);
+
+
     // else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE)
     //     camera.thirdCamera(TPP, deltaTime,0);
 
