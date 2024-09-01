@@ -6,6 +6,7 @@ Makefile
 cmake_install.cmake
 CTestTestfile.cmake
 
+*.zip
 # Compiled object files and binaries
 *.o
 *.obj
